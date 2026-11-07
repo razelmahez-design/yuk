@@ -110,12 +110,12 @@
 
             <!-- Daftar Siswa Container -->
             <div id="daftarSiswa" class="space-y-3 mt-4">
-                <p class="text-center text-xs text-slate-500 py-6">Memuat data siswa...</p>
+                <div class="glass-panel p-4 rounded-2xl text-center text-slate-400 text-xs">Memuat data siswa dari database...</div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK & Logika Koneksi -->
+    <!-- Firebase SDK & Logika Aplikasi Utama -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -134,8 +134,41 @@
         const db = getFirestore(app);
         console.log("Firebase initialized successfully!");
 
+        // Set bulan aktif
         const currentMonth = new Date().getMonth() + 1;
         document.getElementById('filterBulan').value = currentMonth;
+
+        // Fungsi Ambil Data Siswa dari Firestore
+        async function loadSiswa() {
+            const container = document.getElementById('daftarSiswa');
+            try {
+                const querySnapshot = await getDocs(collection(db, "siswa"));
+                if (querySnapshot.empty) {
+                    container.innerHTML = `<div class="glass-panel p-4 rounded-2xl text-center text-slate-400 text-xs">Belum ada data siswa di database.</div>`;
+                    return;
+                }
+                
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    html += `
+                        <div class="glass-panel p-4 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold text-sm text-white">${data.nama || 'Siswa'}</h3>
+                                <p class="text-[11px] text-slate-400">Absen: ${data.absen || '-'}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400">Aktif</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error("Gagal memuat siswa:", error);
+                container.innerHTML = `<div class="glass-panel p-4 rounded-2xl text-center text-red-400 text-xs">Gagal memuat data dari Cloud.</div>`;
+            }
+        }
+
+        loadSiswa();
     </script>
 </body>
 </html>
