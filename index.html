@@ -110,7 +110,6 @@
 
             <!-- Daftar Siswa Container -->
             <div id="daftarSiswa" class="space-y-3 mt-4">
-                <!-- Data siswa akan dimuat otomatis dari Firebase -->
                 <p class="text-center text-xs text-slate-500 py-6">Memuat data siswa...</p>
             </div>
         </div>
@@ -135,7 +134,6 @@
         const db = getFirestore(app);
         console.log("Firebase initialized successfully!");
 
-        // Set otomatis bulan aktif sesuai tanggal sekarang
         const currentMonth = new Date().getMonth() + 1;
         document.getElementById('filterBulan').value = currentMonth;
     </script>
