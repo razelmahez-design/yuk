@@ -19,6 +19,7 @@
 </head>
 <body class="min-h-screen pb-12 flex flex-col items-center">
     <div class="w-full max-w-md md:max-w-xl px-4 pt-4">
+        <!-- Header -->
         <header class="bg-gradient-header rounded-3xl p-6 shadow-xl text-white relative overflow-hidden mb-6">
             <div class="flex justify-between items-start mb-4">
                 <div>
@@ -28,10 +29,94 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Filter Tahun & Bulan -->
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <div>
+                    <label class="text-[10px] uppercase tracking-wider text-blue-200 font-semibold mb-1 block">Pilih Tahun</label>
+                    <select id="filterTahun" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
+                        <option value="2026" class="bg-slate-900 text-white">2026</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase tracking-wider text-blue-200 font-semibold mb-1 block">Pilih Bulan</label>
+                    <select id="filterBulan" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
+                        <option value="1" class="bg-slate-900 text-white">Januari</option>
+                        <option value="2" class="bg-slate-900 text-white">Februari</option>
+                        <option value="3" class="bg-slate-900 text-white">Maret</option>
+                        <option value="4" class="bg-slate-900 text-white">April</option>
+                        <option value="5" class="bg-slate-900 text-white">Mei</option>
+                        <option value="6" class="bg-slate-900 text-white">Juni</option>
+                        <option value="7" class="bg-slate-900 text-white">Juli</option>
+                        <option value="8" class="bg-slate-900 text-white">Agustus</option>
+                        <option value="9" class="bg-slate-900 text-white">September</option>
+                        <option value="10" class="bg-slate-900 text-white">Oktober</option>
+                        <option value="11" class="bg-slate-900 text-white">November</option>
+                        <option value="12" class="bg-slate-900 text-white">Desember</option>
+                    </select>
+                </div>
+            </div>
         </header>
+
+        <!-- Kartu Total Saldo -->
+        <div class="bg-gradient-card rounded-3xl p-6 shadow-xl text-white mb-6">
+            <p class="text-xs uppercase tracking-wider text-blue-200 font-semibold mb-1">Total Saldo Kas</p>
+            <h2 id="totalSaldo" class="text-3xl font-black mb-4">Rp 0</h2>
+            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-white/10">
+                <div>
+                    <p class="text-[11px] text-blue-200">Pemasukan</p>
+                    <p id="totalPemasukan" class="text-sm font-bold">Rp 0</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-blue-200">Pengeluaran</p>
+                    <p id="totalPengeluaran" class="text-sm font-bold">Rp 0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bulanan -->
+        <div class="glass-panel rounded-2xl p-4 mb-6 shadow-lg">
+            <div class="flex justify-between text-xs font-semibold mb-2">
+                <span class="text-slate-300">Progres Iuran Kas Bulan Ini</span>
+                <span id="persenProgres" class="text-blue-400">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-2">
+                <div id="progressBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-400">
+                <span id="infoSesi">0 dari 0 Sesi Terbayar</span>
+                <span>Rp 5.000 / minggu</span>
+            </div>
+        </div>
+
+        <!-- Menu Navigasi Tab -->
+        <div class="flex bg-slate-800/80 p-1.5 rounded-2xl mb-6 border border-slate-700/50">
+            <button id="tabSiswaBtn" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-blue-600 text-white shadow-md">Siswa & Kas</button>
+            <button id="tabTransaksiBtn" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white">Transaksi</button>
+        </div>
+
+        <!-- Konten Tab Siswa -->
+        <div id="contentSiswa" class="space-y-4">
+            <div class="flex gap-2">
+                <input type="text" id="searchSiswa" placeholder="Cari nama siswa..." class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+                <select id="filterStatusSiswa" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <option value="semua">Semua Status</option>
+                    <option value="lunas">Lunas Semua</option>
+                    <option value="belum">Belum Lunas</option>
+                </select>
+            </div>
+
+            <!-- Daftar Siswa Container -->
+            <div id="daftarSiswa" class="space-y-3 mt-4">
+                <!-- Data siswa akan dimuat otomatis dari Firebase -->
+                <p class="text-center text-xs text-slate-500 py-6">Memuat data siswa...</p>
+            </div>
+        </div>
     </div>
 
-    <!-- Firebase SDK & Logika Aplikasi -->
+    <!-- Firebase SDK & Logika Koneksi -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -49,6 +134,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         console.log("Firebase initialized successfully!");
+
+        // Set otomatis bulan aktif sesuai tanggal sekarang
+        const currentMonth = new Date().getMonth() + 1;
+        document.getElementById('filterBulan').value = currentMonth;
     </script>
 </body>
 </html>
